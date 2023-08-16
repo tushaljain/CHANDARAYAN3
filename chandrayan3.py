@@ -1,71 +1,104 @@
-# import pygame module in this program
 import pygame
+import sys
 
-# activate the pygame library
-# initiate pygame and give permission
-# to use pygame's functionality.
+# Initialize Pygame
 pygame.init()
 
-# define the RGB value for white,
-# green, blue colour .
-white = (255, 255, 255)
-green = (0, 255, 0)
-blue = (0, 0, 128)
+# Set up the display
+width, height = 800, 600
+screen = pygame.display.set_mode((width, height))
+pygame.display.set_caption("Chandrayaan 3")
 
-# assigning values to X and Y variable
-X = 600
-Y = 400
+# Define colors
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
 
-# create the display surface object
-# of specific dimension..e(X, Y).
-display_surface = pygame.display.set_mode((X, Y))
+# Initialize spacecraft properties
+spacecraft_position = [0, 0, 0]
+directions = ["N", "E", "S", "W"]
+current_direction = "N"
 
-# set the pygame window name
-pygame.display.set_caption('CHANDRAYAN3')
+# Define movement vectors for each direction
+direction_vectors = {
+    "N": [0, 1, 0],
+    "E": [1, 0, 0],
+    "S": [0, -1, 0],
+    "W": [-1, 0, 0]
+}
 
-# create a font object.
-# 1st parameter is the font file
-# which is present in pygame.
-# 2nd parameter is size of the font
-font = pygame.font.Font('freesansbold.ttf', 32)
 
-# create a text surface object,
-# on which text is drawn on it.
-text = font.render('WELCOME TO CHANDRAYAN3 ', True, green, blue)
 
-# create a rectangular object for the
-# text surface object
-textRect = text.get_rect()
 
-# set the center of the rectangular object.
-textRect.center = (X // 2, Y // 2)
+# Load images for spacecraft and buttons
+spacecraft_image = pygame.image.load("C:/Users/tanvi/Desktop/CHANDARAYAN3/spacecraft.png")  
+forward_button = pygame.image.load("C:/Users/tanvi/Desktop/CHANDARAYAN3/forward.png")  
+right_button = pygame.image.load("C:/Users/tanvi/Desktop/CHANDARAYAN3/right.png")
+left_button = pygame.image.load("C:/Users/tanvi/Desktop/CHANDARAYAN3/left.png")
+background_image = pygame.image.load("C:/Users/tanvi/Desktop/CHANDARAYAN3/moon.jpeg")
 
-# infinite loop
-while True:
 
-	# completely fill the surface object
-	# with white color
-	display_surface.fill(white)
 
-	# copying the text surface object
-	# to the display surface object
-	# at the center coordinate.
-	display_surface.blit(text, textRect)
 
-	# iterate over the list of Event objects
-	# that was returned by pygame.event.get() method.
-	for event in pygame.event.get():
 
-		# if event object type is QUIT
-		# then quitting the pygame
-		# and program both.
-		if event.type == pygame.QUIT:
+spacecraft_image = pygame.transform.scale(spacecraft_image, (100, 100)) 
+forward_button = pygame.transform.scale(forward_button, (50, 50)) 
+right_button = pygame.transform.scale(right_button, (50, 50)) 
+left_button = pygame.transform.scale(left_button, (50, 50)) 
+# background_image = pygame.transform.scale(background_image, (width, height))
 
-			# deactivates the pygame library
-			pygame.quit()
 
-			# quit the program.
-			quit()
 
-		# Draws the surface object to the screen.
-		pygame.display.update()
+# Position of buttons
+button_x = 100
+forward_button_y = 400
+right_button_y = 500
+left_button_y = 500
+
+
+
+# Define font for text
+font = pygame.font.Font(None, 36)
+
+
+
+# Main game loop
+spacecraft_x = width // 2 - spacecraft_image.get_width() // 2
+spacecraft_y = height // 2 - spacecraft_image.get_height() // 2
+running = True
+running = True
+while running:
+    screen.fill(WHITE)
+    
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        
+        # Handle keyboard key presses
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_UP:  # Move forward
+                movement_vector = direction_vectors[current_direction]
+                spacecraft_position = [pos + move for pos, move in zip(spacecraft_position, movement_vector)]
+            elif event.key == pygame.K_RIGHT:  # Turn right
+                current_direction = directions[(directions.index(current_direction) + 1) % 4]
+            elif event.key == pygame.K_LEFT:  # Turn left
+                current_direction = directions[(directions.index(current_direction) - 1) % 4]
+
+    # screen.blit(background_image, (0, 0))
+    # Draw spacecraft image
+    screen.blit(spacecraft_image, (width // 2 - spacecraft_image.get_width() // 2, height // 2 - spacecraft_image.get_height() // 2))
+    
+    # Draw buttons
+    screen.blit(forward_button, (button_x, forward_button_y))
+    screen.blit(right_button, (button_x, right_button_y))
+    screen.blit(left_button, (button_x, left_button_y))
+    
+    # Display current position and direction on the screen
+    position_text = font.render("Current Position: {}".format(spacecraft_position), True, BLACK)
+    direction_text = font.render("Current Direction: {}".format(current_direction), True, BLACK)
+    screen.blit(position_text, (20, 20))
+    screen.blit(direction_text, (20, 60))
+    
+    pygame.display.flip()
+
+pygame.quit()
+sys.exit()
